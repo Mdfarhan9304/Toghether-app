@@ -12,7 +12,7 @@ export const useOnboardingStore = create<OnboardingState>()(
     persist(
         (set) => ({
             hasCompletedOnboarding: false,
-            completeOnboarding: () => set({ hasCompletedOnboarding: true }),
+            completeOnboarding: () => set({ hasCompletedOnboarding: false }),
             resetOnboarding: () => set({ hasCompletedOnboarding: false }),
         }),
         {

@@ -7,12 +7,11 @@ import {
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'nativewind';
 import { ActivityIndicator, View } from 'react-native';
 import '../global.css';
 
 export default function RootLayout() {
-  const { colorScheme } = useColorScheme();
+
 
   const [fontsLoaded] = useFonts({
     'Plus Jakarta Sans': PlusJakartaSans_500Medium, // Mapping generic name if needed, but better to use specific weights
