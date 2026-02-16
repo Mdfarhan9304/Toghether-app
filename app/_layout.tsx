@@ -14,7 +14,7 @@ export default function RootLayout() {
 
 
   const [fontsLoaded] = useFonts({
-    'Plus Jakarta Sans': PlusJakartaSans_500Medium, // Mapping generic name if needed, but better to use specific weights
+    'Plus Jakarta Sans': PlusJakartaSans_500Medium,
     PlusJakartaSans_400Regular,
     PlusJakartaSans_500Medium,
     PlusJakartaSans_700Bold,
@@ -36,6 +36,22 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="paywall"
+          options={{
+            headerShown: false,
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="add-goal"
+          options={{
+            headerShown: false,
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
       </Stack>
     </>
   );

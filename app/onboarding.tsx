@@ -1,4 +1,4 @@
-import { MaterialIcons } from '@expo/vector-icons';
+import PremiumButton from "../components/PremiumButton";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -73,24 +73,12 @@ export default function OnboardingScreen() {
 
                     {/* CTA Button */}
                     <View className="pb-6">
-                        <TouchableOpacity
-                            activeOpacity={0.9}
+                        <PremiumButton
+                            title="Start as a Couple"
                             onPress={handleStart}
-                            className="bg-white rounded-full flex-row items-center justify-center shadow-lg shadow-black/10"
-                            style={{
-                                paddingVertical: 16,
-                                paddingHorizontal: 32,
-                                gap: 8
-                            }}
-                        >
-                            <MaterialIcons name="favorite" size={24} color="#C4175C" />
-                            <Text
-                                className="text-secondary font-[PlusJakartaSans_700Bold]"
-                                style={{ fontSize: 18, lineHeight: 28 }}
-                            >
-                                Start as a Couple
-                            </Text>
-                        </TouchableOpacity>
+                            variant="secondary"
+                            icon="favorite"
+                        />
                     </View>
 
                     {/* Social Proof */}

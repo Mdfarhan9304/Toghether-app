@@ -8,24 +8,41 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import PremiumButton from "../components/PremiumButton";
 import ProgressDots from '../components/ProgressDots';
 
-export default function FullNameInputScreen() {
+export default function EnterCodeScreen() {
     const router = useRouter();
-    const [fullName, setFullName] = useState('');
+    const [code, setCode] = useState('');
     const buttonOpacity = useSharedValue(0.5);
 
+    // Format code as XXX-XXX
+    const handleCodeChange = (text: string) => {
+        // Remove non-alphanumeric chars
+        const cleaned = text.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+        // Limit to 6 chars
+        const trimmed = cleaned.slice(0, 6);
+
+        // Add hyphen if needed
+        let formatted = trimmed;
+        if (trimmed.length > 3) {
+            formatted = `${trimmed.slice(0, 3)}-${trimmed.slice(3)}`;
+        }
+
+        setCode(formatted);
+    };
+
     useEffect(() => {
-        const isValid = fullName.trim().length > 1;
+        const isValid = code.replace('-', '').length === 6;
         buttonOpacity.value = withSpring(isValid ? 1 : 0.5, { damping: 12, stiffness: 200 });
-    }, [fullName]);
+    }, [code]);
 
     const buttonStyle = useAnimatedStyle(() => ({
         opacity: buttonOpacity.value,
     }));
 
     const handleContinue = () => {
-        if (fullName.trim().length <= 1) return;
-        // TODO: Save name to store
-        router.push('/gender-selection');
+        if (code.replace('-', '').length !== 6) return;
+        // TODO: Verify code API call
+        router.push('/(tabs)');
     };
 
     return (
@@ -36,19 +53,13 @@ export default function FullNameInputScreen() {
             <View
                 className="absolute rounded-full bg-primary/5"
                 style={{
-                    width: 256,
-                    height: 256,
-                    top: -80,
-                    right: -32,
+                    width: 256, height: 256, top: -80, right: -32,
                 }}
             />
             <View
                 className="absolute rounded-full bg-primary/5"
                 style={{
-                    width: 320,
-                    height: 320,
-                    bottom: -100,
-                    left: -80,
+                    width: 320, height: 320, bottom: -100, left: -80,
                 }}
             />
 
@@ -72,7 +83,7 @@ export default function FullNameInputScreen() {
                                     entering={FadeIn.duration(400)}
                                     className="flex-1 flex-row items-center justify-center"
                                 >
-                                    <ProgressDots steps={6} currentStep={3} />
+                                    <ProgressDots steps={6} currentStep={5} />
                                 </Animated.View>
                             </View>
 
@@ -81,15 +92,15 @@ export default function FullNameInputScreen() {
                                 <Animated.View entering={FadeInDown.delay(200).duration(500)}>
                                     <Text
                                         className="text-[#111827] font-[PlusJakartaSans_800ExtraBold] text-center mb-3"
-                                        style={{ fontSize: 36, lineHeight: 40, letterSpacing: -0.9 }}
+                                        style={{ fontSize: 30, lineHeight: 36, letterSpacing: -0.75 }}
                                     >
-                                        What's your name?
+                                        Enter Partner Code
                                     </Text>
                                     <Text
                                         className="text-[#6B7280] font-[PlusJakartaSans_500Medium] text-center mb-10"
-                                        style={{ fontSize: 18, lineHeight: 28 }}
+                                        style={{ fontSize: 16, lineHeight: 24 }}
                                     >
-                                        Let's get to know you.
+                                        Enter the 6-digit code shared by your partner.
                                     </Text>
                                 </Animated.View>
 
@@ -101,33 +112,23 @@ export default function FullNameInputScreen() {
                                             paddingVertical: 16,
                                             paddingHorizontal: 24,
                                             borderWidth: 2,
-                                            borderColor: 'rgba(224, 92, 143, 0.3)', // #E05C8F 30%
-                                            borderRadius: 50,
+                                            borderColor: 'rgba(224, 92, 143, 0.3)',
+                                            borderRadius: 20,
                                         }}
                                     >
                                         <TextInput
-                                            className="flex-1 font-[PlusJakartaSans_600SemiBold] text-[#111827] "
-                                            style={{ fontSize: 20 }}
-                                            placeholder="Your First Name"
+                                            className="flex-1 font-[PlusJakartaSans_700Bold] text-[#111827] text-center tracking-[8px]"
+                                            style={{ fontSize: 28 }}
+                                            placeholder="XXX-XXX"
                                             placeholderTextColor="#9CA3AF"
-                                            value={fullName}
-                                            onChangeText={setFullName}
+                                            value={code}
+                                            onChangeText={handleCodeChange}
                                             autoFocus={true}
-                                            autoCapitalize="words"
+                                            autoCapitalize="characters"
                                             autoCorrect={false}
+                                            keyboardType="default"
+                                            maxLength={7} // 6 chars + hyphen
                                         />
-                                        <MaterialIcons name="edit" size={24} color="#C41758" style={{ marginLeft: 8 }} />
-                                    </View>
-
-                                    {/* Helper Text */}
-                                    <View className="flex-row mt-6 pr-6">
-                                        <MaterialIcons name="emoji-emotions" size={20} color="#E05C8F" style={{ marginTop: 2, marginRight: 8 }} />
-                                        <Text
-                                            className="text-[#6B7280] font-[PlusJakartaSans_400Regular] flex-1"
-                                            style={{ fontSize: 14, lineHeight: 22 }}
-                                        >
-                                            Makes the app feel personal. We use this for dashboard headers like "Alex & Sara’s Goals".
-                                        </Text>
                                     </View>
                                 </Animated.View>
                             </View>
@@ -139,9 +140,9 @@ export default function FullNameInputScreen() {
                             >
                                 <Animated.View style={buttonStyle}>
                                     <PremiumButton
-                                        title="Continue"
+                                        title="Link Accounts"
                                         onPress={handleContinue}
-                                        disabled={fullName.trim().length <= 1}
+                                        disabled={code.replace('-', '').length !== 6}
                                     />
                                 </Animated.View>
                             </Animated.View>

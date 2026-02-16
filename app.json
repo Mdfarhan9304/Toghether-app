@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.toghether.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,6 +28,7 @@
     },
     "plugins": [
       "expo-router",
+      "@bacons/apple-targets",
       [
         "expo-splash-screen",
         {
@@ -38,7 +40,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

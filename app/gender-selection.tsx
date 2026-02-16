@@ -2,82 +2,46 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeIn, FadeInDown, FadeInLeft, FadeInRight, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PremiumButton from "../components/PremiumButton";
 import ProgressDots from '../components/ProgressDots';
 import SelectionCard from '../components/SelectionCard';
 
-const goalOptions = [
+// Define options
+const genderOptions = [
     {
-        id: 'trip',
-        icon: 'flight' as const,
-        title: 'Save for a trip',
+        id: 'male',
+        icon: 'male' as const,
+        title: 'Man',
+        description: '', // Card expects description, can be empty or we remove it
     },
     {
-        id: 'communication',
-        icon: 'chat' as const,
-        title: 'Improve communication',
-    },
-    {
-        id: 'date_nights',
-        icon: 'event',
-        title: 'Plan date nights',
-    },
-    {
-        id: 'fitness',
-        icon: 'fitness-center' as const,
-        title: 'Fitness together',
-    },
-    {
-        id: 'save_money',
-        icon: 'savings' as const,
-        title: 'Save money',
-    },
-    {
-        id: 'house',
-        icon: 'cottage' as const,
-        title: 'Buy a house',
-    },
-    {
-        id: 'custom',
-        icon: 'edit' as const,
-        title: 'Custom',
+        id: 'female',
+        icon: 'female' as const,
+        title: 'Woman',
+        description: '',
     },
 ];
 
-export default function GoalSelectionScreen() {
+export default function GenderSelectionScreen() {
     const router = useRouter();
-    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+    const [selectedGender, setSelectedGender] = useState<string | null>(null);
     const buttonOpacity = useSharedValue(0.5);
 
     useEffect(() => {
-        buttonOpacity.value = withSpring(selectedOptions.length > 0 ? 1 : 0.5, { damping: 12, stiffness: 200 });
-    }, [selectedOptions]);
+        buttonOpacity.value = withSpring(selectedGender ? 1 : 0.5, { damping: 12, stiffness: 200 });
+    }, [selectedGender]);
 
     const buttonStyle = useAnimatedStyle(() => ({
         opacity: buttonOpacity.value,
     }));
 
-    const toggleOption = (id: string) => {
-        setSelectedOptions(prev => {
-            if (prev.includes(id)) {
-                return prev.filter(item => item !== id);
-            }
-            if (prev.length >= 3) {
-                // Max 3 selection limit
-                return prev;
-            }
-            return [...prev, id];
-        });
-    };
-
     const handleContinue = () => {
-        if (selectedOptions.length === 0) return;
-        // TODO: Save selection to store
-        // Navigate to next screen
-        router.push('/full-name-input');
+        if (!selectedGender) return;
+        // TODO: Save to store
+        router.push('/dob-input');
     };
 
     return (
@@ -92,7 +56,6 @@ export default function GoalSelectionScreen() {
                     height: 256,
                     top: -80,
                     right: -32,
-                    // Blur approximation
                 }}
             />
             <View
@@ -106,7 +69,7 @@ export default function GoalSelectionScreen() {
             />
 
             <SafeAreaView style={{ flex: 1 }}>
-                {/* Header - Back Button + Progress */}
+                {/* Header */}
                 <View className="flex-row items-center px-4 py-4 relative min-h-[56px]">
                     <TouchableOpacity
                         onPress={() => router.back()}
@@ -119,51 +82,48 @@ export default function GoalSelectionScreen() {
                         entering={FadeIn.duration(400)}
                         className="flex-1 flex-row items-center justify-center"
                     >
-                        <ProgressDots steps={6} currentStep={2} />
+                        <ProgressDots steps={6} currentStep={4} />
                     </Animated.View>
                 </View>
 
-                <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 16 }}>
+                {/* Content */}
+                <View className="flex-1 px-6 pt-8">
                     {/* Title Section */}
                     <Animated.View entering={FadeInDown.delay(200).duration(500)} style={{ marginBottom: 32 }}>
                         <Text
                             className="text-[#111827] font-[PlusJakartaSans_800ExtraBold] text-center mb-3"
                             style={{ fontSize: 30, lineHeight: 36, letterSpacing: -0.75 }}
                         >
-                            Which goals do you{'\n'}want to focus on first?
+                            How do you identify?
                         </Text>
                         <Text
                             className="text-[#6B7280] font-[PlusJakartaSans_500Medium] text-center"
                             style={{ fontSize: 16, lineHeight: 24 }}
                         >
-                            Pick 1-3 to kickstart your journey together.
+                            This helps us personalize your journey.
                         </Text>
                     </Animated.View>
 
-                    {/* Selection Cards */}
-                    <View style={{ gap: 12, paddingBottom: 120 }}>
-                        {goalOptions.map((option, index) => (
+                    {/* Options */}
+                    <View style={{ gap: 16 }}>
+                        {genderOptions.map((option, index) => (
                             <Animated.View
                                 key={option.id}
-                                entering={FadeInLeft.delay(400 + index * 100)
-                                    .duration(500)
-                                    .springify()
-                                    .damping(15)
-                                    .stiffness(150)}
-                                exiting={FadeInRight.duration(500).springify().damping(15).stiffness(150)}
+                                entering={FadeInDown.delay(400 + index * 100).duration(500)}
                             >
                                 <SelectionCard
                                     icon={option.icon}
                                     title={option.title}
-                                    isSelected={selectedOptions.includes(option.id)}
-                                    onPress={() => toggleOption(option.id)}
+                                    description={option.description}
+                                    isSelected={selectedGender === option.id}
+                                    onPress={() => setSelectedGender(option.id)}
                                 />
                             </Animated.View>
                         ))}
                     </View>
-                </ScrollView>
+                </View>
 
-                {/* Fixed Continue Button */}
+                {/* Continue Button */}
                 <Animated.View
                     entering={FadeInUp.delay(800).duration(500)}
                     className="absolute bottom-0 left-0 right-0"
@@ -171,18 +131,13 @@ export default function GoalSelectionScreen() {
                         paddingHorizontal: 24,
                         paddingVertical: 24,
                         paddingBottom: 24,
-                        // Gradient fade (approximated with shadow)
-                        shadowColor: '#F8F6F7',
-                        shadowOffset: { width: 0, height: -20 },
-                        shadowOpacity: 1,
-                        shadowRadius: 20,
                     }}
                 >
                     <Animated.View style={buttonStyle}>
                         <PremiumButton
                             title="Continue"
                             onPress={handleContinue}
-                            disabled={selectedOptions.length === 0}
+                            disabled={!selectedGender}
                         />
                     </Animated.View>
                 </Animated.View>

@@ -41,11 +41,13 @@ export default function SelectionCard({ icon, title, description, isSelected, on
                 style={{
                     padding: 20,
                     gap: 20,
+                    boxShadow: '0px 1px 4px 1px rgba(0,0,0,0.15),inset 0px 4px 4px 0px rgba(255,255,255,0.50),inset 0px -4px 4px 0px rgba(0,0,0,0.06)',
+                    position: 'relative',
                     // Backdrop blur effect (approximated)
                     shadowColor: isSelected ? '#C41758' : '#000',
-                    shadowOffset: { width: 0, height: isSelected ? 3 : 0 },
-                    shadowOpacity: isSelected ? 0.2 : 0,
-                    shadowRadius: isSelected ? 30 : 0,
+                    // shadowOffset: { width: 0, height: isSelected ? 3 : 0 },
+                    // shadowOpacity: isSelected ? 0.2 : 0,
+                    // shadowRadius: isSelected ? 30 : 0,
 
                 }}
             >

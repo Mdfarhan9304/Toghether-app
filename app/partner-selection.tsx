@@ -2,9 +2,10 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInLeft, FadeInRight, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PremiumButton from "../components/PremiumButton";
 import ProgressDots from '../components/ProgressDots';
 import SelectionCard from '../components/SelectionCard';
 
@@ -54,6 +55,26 @@ export default function PartnerSelectionScreen() {
         router.push('/goal-selection');
     };
 
+    const renderItem = ({ item, index }: { item: typeof relationshipOptions[0], index: number }) => (
+        <Animated.View
+            entering={FadeInLeft.delay(400 + index * 100)
+                .duration(500)
+                .springify()
+                .damping(15)
+                .stiffness(150)}
+            exiting={FadeInRight.duration(500).springify().damping(15).stiffness(150)}
+            style={{ marginBottom: 16 }}
+        >
+            <SelectionCard
+                icon={item.icon}
+                title={item.title}
+                description={item.description}
+                isSelected={selectedOption === item.id}
+                onPress={() => setSelectedOption(item.id)}
+            />
+        </Animated.View>
+    );
+
     return (
         <View className="flex-1 bg-[#F8F6F7] relative">
             <StatusBar style="dark" />
@@ -66,7 +87,6 @@ export default function PartnerSelectionScreen() {
                     height: 256,
                     top: -80,
                     right: -32,
-                    // Blur approximation
                 }}
             />
             <View
@@ -93,50 +113,34 @@ export default function PartnerSelectionScreen() {
                         entering={FadeIn.duration(400)}
                         className="flex-1 flex-row items-center justify-center"
                     >
-                        <ProgressDots steps={3} currentStep={0} />
+                        <ProgressDots steps={6} currentStep={1} />
                     </Animated.View>
                 </View>
 
-                <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                    {/* Title Section */}
-                    <Animated.View entering={FadeInDown.delay(200).duration(500)} style={{ marginBottom: 32 }}>
-                        <Text
-                            className="text-[#111827] font-[PlusJakartaSans_800ExtraBold] text-center mb-3"
-                            style={{ fontSize: 30, lineHeight: 36, letterSpacing: -0.75 }}
-                        >
-                            Where are you two in{'\n'}your journey?
-                        </Text>
-                        <Text
-                            className="text-[#6B7280] font-[PlusJakartaSans_500Medium] text-center"
-                            style={{ fontSize: 16, lineHeight: 24 }}
-                        >
-                            We'll tailor your goals based on your stage.
-                        </Text>
-                    </Animated.View>
-
-                    {/* Selection Cards */}
-                    <View style={{ gap: 16, paddingBottom: 120 }}>
-                        {relationshipOptions.map((option, index) => (
-                            <Animated.View
-                                key={option.id}
-                                entering={FadeInLeft.delay(400 + index * 100)
-                                    .duration(500)
-                                    .springify()
-                                    .damping(15)
-                                    .stiffness(150)}
-                                exiting={FadeInRight.duration(500).springify().damping(15).stiffness(150)}
+                {/* FlatList Content */}
+                <FlatList
+                    data={relationshipOptions}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 120 }}
+                    ListHeaderComponent={
+                        <Animated.View entering={FadeInDown.delay(200).duration(500)} style={{ marginBottom: 32 }}>
+                            <Text
+                                className="text-[#111827] font-[PlusJakartaSans_800ExtraBold] text-center mb-3"
+                                style={{ fontSize: 30, lineHeight: 36, letterSpacing: -0.75 }}
                             >
-                                <SelectionCard
-                                    icon={option.icon}
-                                    title={option.title}
-                                    description={option.description}
-                                    isSelected={selectedOption === option.id}
-                                    onPress={() => setSelectedOption(option.id)}
-                                />
-                            </Animated.View>
-                        ))}
-                    </View>
-                </ScrollView>
+                                Where are you two in{'\n'}your journey?
+                            </Text>
+                            <Text
+                                className="text-[#6B7280] font-[PlusJakartaSans_500Medium] text-center"
+                                style={{ fontSize: 16, lineHeight: 24 }}
+                            >
+                                We'll tailor your goals based on your stage.
+                            </Text>
+                        </Animated.View>
+                    }
+                    showsVerticalScrollIndicator={false}
+                />
 
                 {/* Fixed Continue Button */}
                 <Animated.View
@@ -154,29 +158,11 @@ export default function PartnerSelectionScreen() {
                     }}
                 >
                     <Animated.View style={buttonStyle}>
-                        <TouchableOpacity
-                            activeOpacity={0.9}
+                        <PremiumButton
+                            title="Continue"
                             onPress={handleContinue}
                             disabled={!selectedOption}
-                            className="bg-primary rounded-full flex-row items-center justify-center"
-                            style={{
-                                paddingVertical: 16,
-                                gap: 8,
-                                shadowColor: '#000',
-                                shadowOffset: { width: 0, height: 4 },
-                                shadowOpacity: 0.1,
-                                shadowRadius: 6,
-                                elevation: 4,
-                            }}
-                        >
-                            <Text
-                                className="text-white font-[PlusJakartaSans_700Bold]"
-                                style={{ fontSize: 16, lineHeight: 24 }}
-                            >
-                                Continue
-                            </Text>
-                            <MaterialIcons name="arrow-forward" size={18} color="#FFF" />
-                        </TouchableOpacity>
+                        />
                     </Animated.View>
                 </Animated.View>
             </SafeAreaView>
