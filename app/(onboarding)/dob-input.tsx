@@ -7,8 +7,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import PremiumButton from '../components/PremiumButton';
-import ProgressDots from '../components/ProgressDots';
+import PremiumButton from '../../components/PremiumButton';
+import ProgressDots from '../../components/ProgressDots';
 
 export default function DOBInputScreen() {
     const router = useRouter();

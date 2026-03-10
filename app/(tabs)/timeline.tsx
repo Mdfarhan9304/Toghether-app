@@ -1,28 +1,29 @@
-import { MaterialIcons } from '@expo/vector-icons';
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { Text, View } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TimelineScreen() {
-    return (
-        <View className="flex-1" style={{ backgroundColor: '#F9FAFB' }}>
-            <StatusBar style="dark" />
-            <SafeAreaView edges={['top']} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
-                <MaterialIcons name="schedule" size={56} color="#E4E4E7" />
-                <Text
-                    className="font-[PlusJakartaSans_700Bold]"
-                    style={{ fontSize: 22, color: '#09090B', marginTop: 16, marginBottom: 8 }}
-                >
-                    Timeline
-                </Text>
-                <Text
-                    className="font-[PlusJakartaSans_400Regular] text-center"
-                    style={{ fontSize: 15, color: '#A1A1AA', lineHeight: 22 }}
-                >
-                    Your relationship milestones and memories will appear here.
-                </Text>
-            </SafeAreaView>
-        </View>
-    );
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.title}>Your Timeline</Text>
+      </View>
+    </SafeAreaView>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FCF8F9',
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontFamily: 'PlusJakartaSans_700Bold',
+    color: '#8B1D41',
+  },
+});

@@ -1,10 +1,10 @@
-import PremiumButton from "../components/PremiumButton";
+import PremiumButton from "../../components/PremiumButton";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useOnboardingStore } from '../store/onboardingStore';
+import { useOnboardingStore } from '../../store/onboardingStore';
 
 export default function OnboardingScreen() {
     const router = useRouter();
@@ -27,7 +27,7 @@ export default function OnboardingScreen() {
 
             {/* Background Image */}
             <Image
-                source={require('../assets/images/Couple holding hands.png')}
+                source={require('../../assets/images/Couple holding hands.png')}
                 className="absolute w-full h-[65%] top-0 left-0"
                 resizeMode="cover"
             />

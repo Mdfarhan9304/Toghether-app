@@ -72,6 +72,7 @@ export default function PaywallScreen() {
     const handleUpgrade = () => {
         // TODO: Implement purchase logic
         console.log(`Upgrading to ${selectedPlan} plan`);
+        router.replace('/(tabs)');
     };
 
     const handleRestore = () => {
@@ -80,7 +81,7 @@ export default function PaywallScreen() {
     };
 
     const handleClose = () => {
-        router.back();
+        router.replace('/(tabs)');
     };
 
     const handlePressIn = () => {

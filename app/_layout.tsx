@@ -8,6 +8,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import '../global.css';
 
 export default function RootLayout() {
@@ -30,11 +31,11 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
-        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="paywall"
@@ -48,11 +49,11 @@ export default function RootLayout() {
           name="add-goal"
           options={{
             headerShown: false,
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
+            presentation: 'transparentModal',
+            animation: 'fade',
           }}
         />
       </Stack>
-    </>
+    </GestureHandlerRootView>
   );
 }
