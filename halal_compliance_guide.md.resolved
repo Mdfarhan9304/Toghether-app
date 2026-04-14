@@ -1,0 +1,89 @@
+# Making "Together" Halal / Islamic Sharia Compliant
+
+After reviewing your full codebase, here's what needs attention and what's already fine.
+
+---
+
+## ✅ Already Compliant (No Changes Needed)
+
+| Area | Why It's Fine |
+|------|---------------|
+| **Goal categories** (Finance, Health, Fitness, Knowledge, etc.) | All are wholesome, beneficial categories encouraged in Islam |
+| **Savings tracking** | Saving money is halal — no interest/riba calculations in the app |
+| **Daily accountability** | Encouraging good habits and accountability is Islamically positive (tawasul bil-haqq) |
+| **Privacy/RLS policies** | User data is properly secured, partner data only shared via explicit pairing |
+
+---
+
+## ⚠️ Areas That Need Changes
+
+### 1. Relationship Status Options (partner-selection.tsx)
+
+**Issue**: The "Dating" option normalizes pre-marital relationships which isn't Sharia-compliant.
+
+**Current options:**
+- ❌ Dating — "Just started or been together a while"
+- ✅ Engaged — (already fine, as engagement/khitbah is recognized)
+- ✅ Married — (fine)
+- ✅ Long Distance — (neutral, could be married + long distance)
+
+**Recommended changes:**
+- Replace **"Dating"** with **"Newly Wed"** or **"Nikkah"** — "Just started your journey together"
+- Rename **"Engaged"** → **"Engaged (Khitbah)"** — "Planning for your nikkah"
+- Keep **"Married"** → "Building a blessed life together"
+- Keep **"Long Distance"** → "Love across the miles" (fine for married LDR)
+- Optionally add **"Nikkah"** — "Islamically married, starting your life"
+
+### 2. Paywall / Marketing Language (paywall.tsx)
+
+**Issue**: Some language is generic "relationship" framing. Subtle but important:
+- "Invest in your **relationship**" → Could say "**marriage**" or "**bond**"
+- "**Date** Night Ideas" feature → Rename to "**Quality Time** Ideas" or "**Together Time** Ideas"
+- "Visual analytics of your **relationship health**" → "Visual analytics of your **family harmony**"
+
+### 3. Hero Imagery (paywall.tsx)
+
+**Issue**: The paywall uses `couple-sunset-hero.png`. Ensure this image:
+- Does not show physical intimacy
+- Shows modestly dressed individuals
+- Could be replaced with an abstract/calligraphic design or silhouette image
+
+### 4. Goal Terminology Across the App
+
+**Minor adjustments:**
+- "Partner" throughout the app → Consider using "Spouse" as the default label (or making it configurable)
+- The `partner_id` in the database is fine as-is (it's internal, users never see it)
+
+### 5. Consider Adding Islamic Goal Categories
+
+**Optional but powerful differentiator:**
+- 🕌 **Ibadah** — Track salah, Quran reading, dhikr goals together
+- 🌙 **Ramadan** — Fasting, taraweeh, charity goals
+- 📿 **Dua** — Track dua goals as a couple
+- 🤝 **Sadaqah** — Charity/giving goals
+
+---
+
+## 🔒 Things That Are NOT Issues
+
+| Concern | Why It's Fine |
+|---------|---------------|
+| App subscription pricing | Selling a useful product/service is halal |
+| INR/USD currency tracking | Currency conversion itself is fine; there's no riba/interest logic |
+| Partner pairing via invite code | This is just a technical mechanism — no different from sharing a family account |
+| Shared vs Individual goals | Both are fine Islamically |
+
+---
+
+## Summary of Code Changes Required
+
+| File | Change |
+|------|--------|
+| `partner-selection.tsx` | Replace "Dating" option, update descriptions |
+| `paywall.tsx` | Rename "Date Night Ideas" → "Quality Time Ideas", update subtitle text |
+| `goalStore.ts` / UI components | Optionally rename "Partner" → "Spouse" in display labels |
+| New categories (optional) | Add Ibadah/Ramadan/Sadaqah categories to `add-goal.tsx` and `goalStore.ts` |
+| Hero image | Verify modesty compliance (not a code change) |
+
+> [!TIP]
+> The most impactful change is **removing the "Dating" relationship option** and **adding Islamic goal categories** (Ibadah, Quran, Sadaqah). These two changes alone would make the app resonate strongly with Muslim couples as a halal alternative to mainstream couple apps.

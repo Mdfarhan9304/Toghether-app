@@ -2,10 +2,11 @@ import { MaterialIcons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { OnboardingLayout } from '../../components/onboarding/OnboardingLayout';
+import { supabase } from '../../lib/supabase';
 
 // Mock code — in real app fetch from backend
 const COUPLE_CODE = '529-841';
@@ -13,9 +14,69 @@ const COUPLE_CODE = '529-841';
 export default function InvitePartnerScreen() {
     const router = useRouter();
     const [copied, setCopied] = useState(false);
+    const [coupleCode, setCoupleCode] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        let subscription: any;
+        
+        const fetchProfileData = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) return;
+            
+            const userId = session.user.id;
+            
+            // 1. Fetch initial code
+            const { data } = await supabase
+                .from('profiles')
+                .select('invite_code, partner_id')
+                .eq('id', userId)
+                .single();
+                
+            if (data) {
+                setCoupleCode(data.invite_code);
+                
+                // If somehow already linked, move forward
+                if (data.partner_id) {
+                    router.push('/paywall');
+                }
+            }
+            setIsLoading(false);
+
+            // 2. Subscribe to changes on this user's profile row
+            subscription = supabase
+                .channel('schema-db-changes')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'UPDATE',
+                        schema: 'public',
+                        table: 'profiles',
+                        filter: `id=eq.${userId}`
+                    },
+                    (payload) => {
+                        console.log('Profile updated!', payload.new);
+                        // If partner_id gets set, someone linked with us
+                        if (payload.new.partner_id) {
+                            router.push('/paywall');
+                        }
+                    }
+                )
+                .subscribe();
+        };
+
+        fetchProfileData();
+        
+        return () => {
+            if (subscription) {
+                supabase.removeChannel(subscription);
+            }
+        };
+    }, []);
 
     const handleCopy = async () => {
-        await Clipboard.setStringAsync(COUPLE_CODE);
+        if (!coupleCode) return;
+        await Clipboard.setStringAsync(coupleCode);
         setCopied(true);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         setTimeout(() => setCopied(false), 2000);
@@ -71,12 +132,16 @@ export default function InvitePartnerScreen() {
                     Your Couple Code
                 </Text>
 
-                <Text
-                    className="font-[PlusJakartaSans_800ExtraBold]"
-                    style={{ fontSize: 48, color: '#C4175C', letterSpacing: -1, marginBottom: 24 }}
-                >
-                    {COUPLE_CODE}
-                </Text>
+                {isLoading ? (
+                    <ActivityIndicator size="large" color="#C4175C" style={{ marginVertical: 12 }} />
+                ) : (
+                    <Text
+                        className="font-[PlusJakartaSans_800ExtraBold]"
+                        style={{ fontSize: 48, color: '#C4175C', letterSpacing: -1, marginBottom: 24 }}
+                    >
+                        {coupleCode}
+                    </Text>
+                )}
 
                 <Text
                     className="font-[PlusJakartaSans_500Medium]"

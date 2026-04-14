@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const ICON_MAP: Record<string, keyof typeof MaterialIcons.glyphMap> = {
     index: 'home',
     timeline: 'schedule',
+    quiz: 'quiz',
     chat: 'chat-bubble-outline',
     profile: 'person-outline',
 };

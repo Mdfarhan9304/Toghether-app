@@ -2,13 +2,17 @@ import PremiumButton from "../../components/PremiumButton";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, Alert, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useOnboardingStore } from '../../store/onboardingStore';
+import { supabase } from '../../lib/supabase';
+import { useState } from 'react';
 
 export default function OnboardingScreen() {
     const router = useRouter();
     const { completeOnboarding } = useOnboardingStore();
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleStart = () => {
         // Navigate to partner selection screen
@@ -16,9 +20,11 @@ export default function OnboardingScreen() {
     };
 
     const handleLogin = () => {
-        // Navigate to login
-        // router.push('/auth/login');
-        console.log("Navigate to login");
+        router.push('/(auth)/login');
+    };
+
+    const handleSignupWithEmail = () => {
+        router.push('/(auth)/login');
     };
 
     return (
@@ -71,14 +77,27 @@ export default function OnboardingScreen() {
                         </Text>
                     </View>
 
-                    {/* CTA Button */}
-                    <View className="pb-6">
+                    {/* CTA Buttons */}
+                    <View className="pb-6" style={{ gap: 12 }}>
                         <PremiumButton
                             title="Start as a Couple"
                             onPress={handleStart}
                             variant="secondary"
                             icon="favorite"
+                            disabled={isLoading}
                         />
+                        <View className="flex-row gap-2 h-14">
+                            <TouchableOpacity
+                                onPress={handleSignupWithEmail}
+                                disabled={isLoading}
+                                className="flex-1 rounded-full items-center justify-center bg-white/10 overflow-hidden relative"
+                            >
+                                <View className="absolute inset-0 border border-white/20 rounded-full" />
+                                <Text className="text-white font-[PlusJakartaSans_700Bold] text-base">
+                                    Log in with Email
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
                     </View>
 
                     {/* Social Proof */}

@@ -1,11 +1,13 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, TextInput, View } from 'react-native';
 import { OnboardingLayout } from '../../components/onboarding/OnboardingLayout';
+import { supabase } from '../../lib/supabase';
 
 export default function EnterCodeScreen() {
     const router = useRouter();
     const [code, setCode] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const isValid = code.replace('-', '').length === 6;
 
     const handleCodeChange = (text: string) => {
@@ -13,9 +15,47 @@ export default function EnterCodeScreen() {
         setCode(cleaned.length > 3 ? `${cleaned.slice(0, 3)}-${cleaned.slice(3)}` : cleaned);
     };
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         if (!isValid) return;
-        // TODO: Verify code API call
+        setIsLoading(true);
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            setIsLoading(false);
+            Alert.alert('Error', 'Not authenticated.');
+            return;
+        }
+
+        const myId = session.user.id;
+
+        // 1. Find profile with this invite code
+        const { data: partnerData, error: findError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('invite_code', code)
+            .single();
+
+        if (findError || !partnerData) {
+            setIsLoading(false);
+            Alert.alert('Invalid Code', 'Could not find a partner with this code. Please check and try again.');
+            return;
+        }
+
+        const partnerId = partnerData.id;
+
+        if (partnerId === myId) {
+            setIsLoading(false);
+            Alert.alert('Error', 'You cannot enter your own code.');
+            return;
+        }
+
+        // 2. Link them together
+        // Update my partner_id
+        await supabase.from('profiles').update({ partner_id: partnerId }).eq('id', myId);
+        // Update their partner_id
+        await supabase.from('profiles').update({ partner_id: myId }).eq('id', partnerId);
+
+        setIsLoading(false);
         router.push('/paywall');
     };
 
@@ -24,10 +64,10 @@ export default function EnterCodeScreen() {
             step={5}
             title="Enter Partner Code"
             subtitle="Enter the 6-digit code shared by your partner."
-            buttonLabel="Link Accounts"
+            buttonLabel={isLoading ? "Linking..." : "Link Accounts"}
             onContinue={handleContinue}
             onBack={() => router.back()}
-            continueDisabled={!isValid}
+            continueDisabled={!isValid || isLoading}
             avoidKeyboard
         >
             <View

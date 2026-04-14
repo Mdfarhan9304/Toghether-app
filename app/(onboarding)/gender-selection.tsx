@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import SelectionCard from '../../components/SelectionCard';
 import { OnboardingLayout } from '../../components/onboarding/OnboardingLayout';
+import { useOnboardingStore } from '../../store/onboardingStore';
 
 const GENDER_OPTIONS = [
     { id: 'male', icon: 'male' as const, title: 'Man', description: '' },
@@ -13,10 +14,11 @@ const GENDER_OPTIONS = [
 export default function GenderSelectionScreen() {
     const router = useRouter();
     const [selectedGender, setSelectedGender] = useState<string | null>(null);
+    const { setGender } = useOnboardingStore();
 
     const handleContinue = () => {
         if (!selectedGender) return;
-        // TODO: Save to store
+        setGender(selectedGender);
         router.push('/dob-input');
     };
 

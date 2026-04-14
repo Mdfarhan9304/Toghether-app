@@ -33,11 +33,13 @@ export function ScoreCard({
         <View style={{ paddingHorizontal: 20, marginBottom: 20 }}>
             <View
                 style={{
-                    backgroundColor: '#C4175C',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     borderRadius: 24,
                     padding: 24,
                     overflow: 'hidden',
-                    boxShadow: '0px 2px 4px 0px rgba(0,0,0,0.15),inset 0px 4px 4px 0px rgba(255,255,255,0.50),inset 0px -4px 4px 0px rgba(0,0,0,0.15)',
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                    borderWidth: 1,
+                    boxShadow: '0px 8px 32px 0px rgba(163, 22, 69, 0.3)',
                 } as any}
             >
                 {/* Gyroscope-driven circle */}

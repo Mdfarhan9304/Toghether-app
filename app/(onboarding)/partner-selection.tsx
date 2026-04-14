@@ -1,9 +1,10 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import Animated, { FadeInLeft, FadeInRight } from 'react-native-reanimated';
 import SelectionCard from '../../components/SelectionCard';
 import { OnboardingLayout } from '../../components/onboarding/OnboardingLayout';
+import { useOnboardingStore } from '../../store/onboardingStore';
 
 const RELATIONSHIP_OPTIONS = [
     { id: 'dating', icon: 'favorite' as const, title: 'Dating', description: 'Just started or been together a while' },
@@ -15,10 +16,11 @@ const RELATIONSHIP_OPTIONS = [
 export default function PartnerSelectionScreen() {
     const router = useRouter();
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
+    const { setRelationshipStatus } = useOnboardingStore();
 
     const handleContinue = () => {
         if (!selectedOption) return;
-        // TODO: Save to store
+        setRelationshipStatus(selectedOption);
         router.push('/goal-selection');
     };
 
@@ -31,7 +33,11 @@ export default function PartnerSelectionScreen() {
             onBack={() => router.back()}
             continueDisabled={!selectedOption}
         >
-            <View style={{ gap: 16 }}>
+            <ScrollView 
+                style={{ marginHorizontal: -12 }}
+                contentContainerStyle={{ gap: 16, paddingBottom: 20, paddingHorizontal: 12 }}
+                showsVerticalScrollIndicator={false}
+            >
                 {RELATIONSHIP_OPTIONS.map((item, index) => (
                     <Animated.View
                         key={item.id}
@@ -47,7 +53,7 @@ export default function PartnerSelectionScreen() {
                         />
                     </Animated.View>
                 ))}
-            </View>
+            </ScrollView>
         </OnboardingLayout>
     );
 }

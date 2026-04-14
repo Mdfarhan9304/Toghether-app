@@ -34,7 +34,7 @@ export function HomeHeader({
                     style={{
                         fontSize: 11,
                         letterSpacing: 1.8,
-                        color: '#E11D48',
+                        color: '#FFE4E6', // Rose 100
                         marginBottom: 4,
                     }}
                 >
@@ -42,7 +42,7 @@ export function HomeHeader({
                 </Text>
                 <Text
                     className="font-[PlusJakartaSans_800ExtraBold]"
-                    style={{ fontSize: 26, color: '#09090B', lineHeight: 32 }}
+                    style={{ fontSize: 26, color: '#FFFFFF', lineHeight: 32 }}
                 >
                     {names}
                 </Text>
@@ -74,7 +74,7 @@ export function HomeHeader({
                     />
                 </View>
                 <TouchableOpacity onPress={onSettingsPress}>
-                    <MaterialIcons name="settings" size={24} color="#A1A1AA" />
+                    <MaterialIcons name="settings" size={24} color="#E4E4E7" />
                 </TouchableOpacity>
             </View>
         </View>

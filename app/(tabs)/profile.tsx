@@ -1,17 +1,127 @@
 import { MaterialIcons, Ionicons, Feather } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, ScrollView, Text, TouchableOpacity, View, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { supabase } from '../../lib/supabase';
+import { useRouter } from 'expo-router';
+import { useOnboardingStore } from '../../store/onboardingStore';
+
+interface Profile {
+    id: string;
+    full_name: string;
+    gender: string;
+    dob: string;
+    invite_code: string;
+    partner_id: string | null;
+    relationship_status: string;
+    created_at: string;
+}
 
 export default function ProfileScreen() {
+    const router = useRouter();
+    const [loading, setLoading] = useState(true);
+    const [profile, setProfile] = useState<Profile | null>(null);
+    const [partnerProfile, setPartnerProfile] = useState<Profile | null>(null);
+
+    useEffect(() => {
+        fetchProfile();
+    }, []);
+
+    const fetchProfile = async () => {
+        try {
+            setLoading(true);
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!session) {
+                setLoading(false);
+                return;
+            }
+
+            const { data: profileData, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+
+            if (error) throw error;
+            setProfile(profileData);
+
+            if (profileData.partner_id) {
+                const { data: partnerData, error: partnerError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', profileData.partner_id)
+                    .single();
+                
+                if (!partnerError) {
+                    setPartnerProfile(partnerData);
+                }
+            }
+        } catch (error: any) {
+            console.error('Error fetching profile:', error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        Alert.alert(
+            "Logout",
+            "Are you sure you want to logout?",
+            [
+                { text: "Cancel", style: "cancel" },
+                { 
+                    text: "Logout", 
+                    style: "destructive",
+                    onPress: async () => {
+                        const { error } = await supabase.auth.signOut();
+                        if (error) {
+                            Alert.alert('Error', error.message);
+                        } else {
+                            if (router.canDismiss()) {
+                                router.dismissAll();
+                            }
+                            useOnboardingStore.getState().resetOnboarding();
+                            router.replace('/(onboarding)/onboarding');
+                        }
+                    }
+                }
+            ]
+        );
+    };
+
+    const formatDate = (dateString: string) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    };
+
+    const getMemberSince = (dateString: string) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return `MEMBER SINCE ${date.toLocaleString('en-US', { month: 'long' }).toUpperCase()} ${date.getFullYear()}`;
+    };
+
+    if (loading) {
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#C4175C" />
+            </View>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.container} edges={['top']}>
             <StatusBar style="dark" />
             
             {/* ─── Header ─── */}
             <View style={styles.header}>
-                <TouchableOpacity style={styles.iconButton}>
+                <TouchableOpacity style={styles.iconButton} onPress={() => router.back()}>
                     <MaterialIcons name="chevron-left" size={28} color="#C4175C" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Account & Settings</Text>
@@ -27,15 +137,15 @@ export default function ProfileScreen() {
                     <View style={styles.avatarContainer}>
                         {/* Placeholder image for user */}
                         <Image 
-                            source={{ uri: 'https://i.pravatar.cc/150?img=68' }} 
+                            source={{ uri: `https://ui-avatars.com/api/?name=${profile?.full_name || 'User'}&background=C4175C&color=fff` }} 
                             style={styles.avatarImage} 
                         />
                         <View style={styles.nameBadge}>
-                            <Text style={styles.nameBadgeText}>ALEX</Text>
+                            <Text style={styles.nameBadgeText}>{profile?.full_name?.split(' ')[0].toUpperCase() || 'USER'}</Text>
                         </View>
                     </View>
-                    <Text style={styles.profileName}>Alex Smith</Text>
-                    <Text style={styles.memberSince}>MEMBER SINCE JUNE 2022</Text>
+                    <Text style={styles.profileName}>{profile?.full_name || 'Guest User'}</Text>
+                    <Text style={styles.memberSince}>{getMemberSince(profile?.created_at || '')}</Text>
                 </View>
 
                 {/* ─── OUR PARTNERSHIP (or ACCOUNT DETAILS) ─── */}
@@ -55,8 +165,6 @@ export default function ProfileScreen() {
                             </View>
                         </View>
                         
-                        <View style={styles.divider} />
-                        
                         <View style={styles.row}>
                             <View style={[styles.iconBox, { backgroundColor: '#FFF0F3' }]}>
                                 <MaterialIcons name="qr-code" size={20} color="#C4175C" />
@@ -64,7 +172,7 @@ export default function ProfileScreen() {
                             <View style={styles.rowContent}>
                                 <Text style={styles.rowTitle}>Personal Code</Text>
                             </View>
-                            <Text style={styles.rowValue}>TGT-8829</Text>
+                            <Text style={styles.rowValue}>{profile?.invite_code || '---'}</Text>
                             <MaterialIcons name="content-copy" size={16} color="#A1A1AA" style={{ marginLeft: 8 }} />
                         </View>
 
@@ -75,10 +183,25 @@ export default function ProfileScreen() {
                                 <MaterialIcons name="calendar-today" size={20} color="#C4175C" />
                             </View>
                             <View style={styles.rowContent}>
-                                <Text style={styles.rowTitle}>Joined Together</Text>
+                                <Text style={styles.rowTitle}>Birthday</Text>
                             </View>
-                            <Text style={styles.rowValue}>October 12th</Text>
+                            <Text style={styles.rowValue}>{formatDate(profile?.dob || '')}</Text>
                         </View>
+
+                        {partnerProfile && (
+                            <>
+                                <View style={styles.divider} />
+                                <View style={styles.row}>
+                                    <View style={[styles.iconBox, { backgroundColor: '#FFF0F3' }]}>
+                                        <MaterialIcons name="favorite" size={20} color="#C4175C" />
+                                    </View>
+                                    <View style={styles.rowContent}>
+                                        <Text style={styles.rowTitle}>Partner</Text>
+                                        <Text style={styles.rowSubtitle}>{partnerProfile.full_name}</Text>
+                                    </View>
+                                </View>
+                            </>
+                        )}
                     </View>
                 </View>
 
@@ -198,7 +321,7 @@ export default function ProfileScreen() {
 
                         <View style={styles.divider} />
 
-                        <TouchableOpacity style={styles.row}>
+                        <TouchableOpacity style={styles.row} onPress={handleLogout}>
                             <View style={[styles.iconBox, { backgroundColor: 'transparent' }]}>
                                 <MaterialIcons name="logout" size={20} color="#E11D48" style={{ transform: [{ scaleX: -1 }] }} />
                             </View>

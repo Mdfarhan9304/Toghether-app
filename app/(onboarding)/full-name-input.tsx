@@ -2,15 +2,17 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { OnboardingLayout } from '../../components/onboarding/OnboardingLayout';
+import { useOnboardingStore } from '../../store/onboardingStore';
 
 export default function FullNameInputScreen() {
     const router = useRouter();
     const [fullName, setFullName] = useState('');
     const isValid = fullName.trim().length > 1;
+    const { setFullName: storeSetFullName } = useOnboardingStore();
 
     const handleContinue = () => {
         if (!isValid) return;
-        // TODO: Save name to store
+        storeSetFullName(fullName.trim());
         router.push('/gender-selection');
     };
 

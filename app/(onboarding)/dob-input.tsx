@@ -4,17 +4,21 @@ import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PremiumButton from '../../components/PremiumButton';
 import ProgressDots from '../../components/ProgressDots';
+import { useOnboardingStore } from '../../store/onboardingStore';
+import { supabase } from '../../lib/supabase';
 
 export default function DOBInputScreen() {
     const router = useRouter();
+    const { fullName, gender, relationshipStatus, selectedGoals, setDob } = useOnboardingStore();
     // Default to a reasonable date (e.g. 25 years ago)
     const [date, setDate] = useState(new Date(2000, 0, 1));
     const [hasChanged, setHasChanged] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     // Android specific state
     const [day, setDay] = useState('01');
@@ -52,7 +56,12 @@ export default function DOBInputScreen() {
         opacity: buttonOpacity.value,
     }));
 
-    const handleContinue = () => {
+    const generateInviteCode = () => {
+        // Generate a random 6 digit string
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    };
+
+    const handleContinue = async () => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
         let finalDate = date;
@@ -65,15 +74,17 @@ export default function DOBInputScreen() {
             const newDate = new Date(y, m, d);
             if (newDate.getDate() !== d || newDate.getMonth() !== m || newDate.getFullYear() !== y) {
                 // Invalid date (e.g. Feb 31)
-                // You could add an alert here
+                Alert.alert('Invalid Date', 'Please enter a valid date.');
                 return;
             }
             finalDate = newDate;
         }
 
-        // TODO: Save DOB to store
-        console.log(`DOB: ${finalDate.toISOString()}`);
-        router.push('/invite-partner');
+        const dateString = finalDate.toISOString().split('T')[0];
+        setDob(dateString);
+
+        // Onboarding is exclusively for new users, always proceed to password creation
+        router.push('/create-password');
     };
 
     const onChange = (event: any, selectedDate?: Date) => {
@@ -347,11 +358,17 @@ export default function DOBInputScreen() {
                                 }}
                             >
                                 <Animated.View style={buttonStyle}>
-                                    <PremiumButton
-                                        title="Continue"
-                                        onPress={handleContinue}
-                                        disabled={false}
-                                    />
+                                    {isLoading ? (
+                                        <View style={{ backgroundColor: '#111827', borderRadius: 999, paddingVertical: 18, alignItems: 'center' }}>
+                                            <ActivityIndicator color="#FFF" />
+                                        </View>
+                                    ) : (
+                                        <PremiumButton
+                                            title="Continue"
+                                            onPress={handleContinue}
+                                            disabled={false}
+                                        />
+                                    )}
                                 </Animated.View>
                             </Animated.View>
                         </View>

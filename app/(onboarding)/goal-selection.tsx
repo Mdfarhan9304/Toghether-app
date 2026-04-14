@@ -4,6 +4,7 @@ import { ScrollView, View } from 'react-native';
 import Animated, { FadeInLeft, FadeInRight } from 'react-native-reanimated';
 import SelectionCard from '../../components/SelectionCard';
 import { OnboardingLayout } from '../../components/onboarding/OnboardingLayout';
+import { useOnboardingStore } from '../../store/onboardingStore';
 
 const GOAL_OPTIONS = [
     { id: 'trip', icon: 'flight' as const, title: 'Save for a trip', description: 'Plan and save together for vacations' },
@@ -18,6 +19,7 @@ const GOAL_OPTIONS = [
 export default function GoalSelectionScreen() {
     const router = useRouter();
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+    const { setSelectedGoals } = useOnboardingStore();
 
     const toggleOption = (id: string) => {
         setSelectedOptions(prev => {
@@ -29,7 +31,7 @@ export default function GoalSelectionScreen() {
 
     const handleContinue = () => {
         if (selectedOptions.length === 0) return;
-        // TODO: Save selection to store
+        setSelectedGoals(selectedOptions);
         router.push('/full-name-input');
     };
 
